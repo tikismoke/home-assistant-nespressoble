@@ -14,10 +14,8 @@ global device
 oldvalue = None
 device= None
 # Nespresso bluetooth MAC address
-YOUR_DEVICE_ADDRESS = "XX:XX:XX:XX:XX"
-# Nespresso Apps secret code (you nedd to sniff it to find it)
-# Replace XX by value (it's in hex format)
-AUTH_CODE = [0x8X, 0xXX,0xXX,0xXX,0xXX,0xXX,0xXX,0xXX]
+YOUR_DEVICE_ADDRESS = "XX:XX:XX:XX:XX:XX"
+AUTH_CODE = [0xXX, 0xXX,0xXX,0xXX,0xXX,0xXX,0xXX,0xXX]
 # MQTT Broker IP or Name
 broker="mosquito"
 # MQTT Broker port
@@ -135,13 +133,16 @@ def connectnespresso(device,tries=0):
             raise error
 
 ADDRESS_TYPE = pygatt.BLEAddressType.random
-adapter = pygatt.GATTToolBackend()
+#adapter = pygatt.GATTToolBackend()
+adapter = pygatt.backends.GATTToolBackend()
 adapter.start()
 device = connectble()
 connectnespresso(device)
 
 BYTE = Flags()
 
+#discover_service(device)
+#new_cofee(device)
 while True:
     value = device.char_read("06aa3a12-f22a-11e3-9daa-0002a5d5c51b")
     if oldvalue != value:
@@ -153,22 +154,22 @@ while True:
         BYTE.asByte = value[0]
         print( "water_is_empty: %i"      % BYTE.bit0)
         try:
-            client1.publish("/Nespresso/etat/water_empty", BYTE.bit0)
+            client1.publish("/Nespresso/state/water_empty", BYTE.bit0)
         except:
             print ("error publishing this value")
         print( "Descaled needed:  %i" % BYTE.bit3)
         try:
-            client1.publish("/Nespresso/etat/descaled_needed", BYTE.bit3)
+            client1.publish("/Nespresso/state/descaled_needed", BYTE.bit3)
         except:
             print ("error publishing this value")
         print( "capsule_mechanism_jammed:  %i" % BYTE.bit4)
         try:
-            client1.publish("/Nespresso/etat/capsule_mechanism_jammed", BYTE.bit4)
+            client1.publish("/Nespresso/state/capsule_mechanism_jammed", BYTE.bit4)
         except:
             print ("error publishing this value")
         print( "always_1 :  %i" % BYTE.bit6)
         try:
-            client1.publish("/Nespresso/etat/always_1", BYTE.bit6)
+            client1.publish("/Nespresso/state/always_1", BYTE.bit6)
         except:
             print ("error publishing this value")
 
@@ -176,37 +177,37 @@ while True:
         BYTE.asByte = value[1]
         print("water temp_low:  %i" % BYTE.bit0)
         try:
-            client1.publish("/Nespresso/etat/water_temp_low", BYTE.bit0)
+            client1.publish("/Nespresso/state/water_temp_low", BYTE.bit0)
         except:
             print ("error publishing this value")
         print("awake: %i" % BYTE.bit1)
         try:
-            client1.publish("/Nespresso/etat/awake", BYTE.bit1)
+            client1.publish("/Nespresso/state/awake", BYTE.bit1)
         except:
             print ("error publishing this value")
         print("water_engaged: %i" % BYTE.bit2)
         try:
-            client1.publish("/Nespresso/etat/water_engadged", BYTE.bit2)
+            client1.publish("/Nespresso/state/water_engadged", BYTE.bit2)
         except:
             print ("error publishing this value")
         print("sleeping %i" % BYTE.bit3)
         try:
-            client1.publish("/Nespresso/etat/sleeping", BYTE.bit3)
+            client1.publish("/Nespresso/state/sleeping", BYTE.bit3)
         except:
             print ("error publishing this value")
         print("tray_sensor_tripped_during_brewing: %i" % BYTE.bit4)
         try:
-            client1.publish("/Nespresso/etat/tray_sensor_during_brewing", BYTE.bit4)
+            client1.publish("/Nespresso/state/tray_sensor_during_brewing", BYTE.bit4)
         except:
             print ("error publishing this value")
         print("tray_open_tray_sensor_full: %i" % BYTE.bit6)
         try:
-            client1.publish("/Nespresso/etat/tray_open_tray_sensor_full", BYTE.bit6)
+            client1.publish("/Nespresso/state/tray_open_tray_sensor_full", BYTE.bit6)
         except:
             print ("error publishing this value")
         print("capsule_engaged: %i" % BYTE.bit7)
         try:
-            client1.publish("/Nespresso/etat/capsule_engaged", BYTE.bit7)
+            client1.publish("/Nespresso/state/capsule_engaged", BYTE.bit7)
         except:
             print ("error publishing this value")
 
@@ -227,16 +228,16 @@ while True:
         print("Slider closed?:  %i" % BYTE.bit1)
         try:
             if (binascii.hexlify(trappe)) == b'00':
-                client1.publish("/Nespresso/Slider/","Open" )
+                client1.publish("/Nespresso/Slider","Open" )
             else :
-                client1.publish("/Nespresso/Slider/","Closed" )
+                client1.publish("/Nespresso/Slider","Closed" )
         except:
             print ("error publishing Slider")
 
         nb_capsule = device.char_read("06aa3a15-f22a-11e3-9daa-0002a5d5c51b")
         print("Nb capsule %s" % int.from_bytes(nb_capsule, byteorder='big'))
         try:
-            client1.publish("/Nespresso/Nbcapsule/", int.from_bytes(nb_capsule,byteorder='big'))
+            client1.publish("/Nespresso/Nbcapsule", int.from_bytes(nb_capsule,byteorder='big'))
         except:
             print ("error publishing this value")
         oldvalue = value
