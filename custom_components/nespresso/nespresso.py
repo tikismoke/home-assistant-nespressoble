@@ -68,28 +68,10 @@ class BaseDecode:
             res = val
         return {self.name:res}
 
-
-class PlussDecode(BaseDecode):
-    def decode_data(self, raw_data):
-        val = super().decode_data(raw_data)
-        val = val[self.name]
-        data = {}
-        data['date_time'] = str(datetime.isoformat(datetime.now()))
-        data['humidity'] = val[1]/2.0
-        data['radon_1day_avg'] = val[4] if 0 <= val[4] <= 16383 else None
-        data['radon_longterm_avg'] = val[5] if 0 <= val[5] <= 16383 else None
-        data['temperature'] = val[6]/100.0
-        data['rel_atm_pressure'] = val[7]/50.0
-        data['co2'] = val[8]*1.0
-        data['voc'] = val[9]*1.0
-        return data
-
-
 sensor_decoders = {str(CHAR_UUID_STATE):BaseDecode(name="State", format_type='HHHHHHHHHHHHHHHHHH'),
                    str(CHAR_UUID_NBCAPS):BaseDecode(name="caps_number", format_type='caps_number'),
                    str(CHAR_UUID_SLIDER):BaseDecode(name="slider", format_type='slider'),
                    str(CHAR_UUID_WATER_HARDNESS):BaseDecode(name="water_hardness", format_type='water_hardness'),}
-
 
 class NespressoDetect:
     def __init__(self, scan_interval, AUTH_CODE=None, mac=None):
@@ -100,7 +82,6 @@ class NespressoDetect:
         self.sensordata = {}
         self.scan_interval = scan_interval
         self.last_scan = -1
-
 
     def find_devices(self):
         # Scan for devices and try to figure out if it is an Nespresso device.
@@ -217,7 +198,6 @@ class NespressoDetect:
                 self.adapter.stop()
 
         return self.sensordata
-
 
 if __name__ == "__main__":
     logging.basicConfig()

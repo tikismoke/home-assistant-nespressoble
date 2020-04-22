@@ -8,13 +8,14 @@ https://home-assistant.io/components/sensor.Nespresso/
 import logging
 from datetime import timedelta
 
-import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import (ATTR_DEVICE_CLASS, ATTR_ICON, CONF_MAC, CONF_RESOURCE,
-                                 CONF_NAME, CONF_SCAN_INTERVAL,
-                                 CONF_UNIT_SYSTEM,
-                                 DEVICE_CLASS_TEMPERATURE, DEVICE_CLASS_TIMESTAMP,
+from homeassistant.const import (ATTR_DEVICE_CLASS, ATTR_ICON, CONF_MAC,
+                                 CONF_NAME, CONF_RESOURCE, CONF_SCAN_INTERVAL,
+                                 CONF_UNIT_SYSTEM, DEVICE_CLASS_TEMPERATURE,
+                                 DEVICE_CLASS_TIMESTAMP,
                                  EVENT_HOMEASSISTANT_STOP, STATE_UNKNOWN,
                                  TEMP_CELSIUS, TEMPERATURE)
 from homeassistant.helpers.entity import Entity
