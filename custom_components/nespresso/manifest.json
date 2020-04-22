@@ -1,0 +1,10 @@
+{
+    "domain": "Nespresso",
+    "name": "Nespresso coffee machine",
+    "documentation": "https://github.com/tikismoke/nespresso2mqtt",
+    "dependencies": [],
+    "codeowners": ["@Tikismoke"],
+    "requirements": [
+      "pygatt[GATTTOOL]==4.0.5"
+    ]
+  }

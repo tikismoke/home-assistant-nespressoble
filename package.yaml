@@ -1,0 +1,18 @@
+author:
+  email: tikismoke@users.noreply.github.com
+  homepage: https://github.com/tikismoke/nespresso2mqtt
+  name: Tikismoke
+description: Nespresso component
+files:
+  - custom_components/nespresso/__init__.py
+  - custom_components/nespresso/sensor.py
+keywords:
+  - coffee
+  - nespresso
+  - homeassistant
+  - home-assistant
+  - custom-component
+  - python
+license: MIT License
+name: sensor.nespresso
+type: component

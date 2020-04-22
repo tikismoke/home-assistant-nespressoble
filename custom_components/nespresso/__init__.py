@@ -1,0 +1,1 @@
+"""The Nespresso Bluetooth component."""
