@@ -2,7 +2,7 @@ author:
   email: tikismoke@users.noreply.github.com
   homepage: https://github.com/tikismoke/nespresso2mqtt
   name: Tikismoke
-description: Nespresso component
+description: Nespresso ble component
 files:
   - custom_components/nespresso/__init__.py
   - custom_components/nespresso/sensor.py

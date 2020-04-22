@@ -1,7 +1,7 @@
 {
     "domain": "Nespresso",
-    "name": "Nespresso coffee machine",
-    "documentation": "https://github.com/tikismoke/nespresso2mqtt",
+    "name": "Nespresso BLE coffee machine",
+    "documentation": "https://github.com/tikismoke/home-assistant-nespressoble",
     "dependencies": [],
     "codeowners": ["@Tikismoke"],
     "requirements": [
