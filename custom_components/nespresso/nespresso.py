@@ -163,6 +163,23 @@ class NespressoDetect:
 
         return self.sensors
 
+    def connectnespresso(self,device,tries=0):
+        try:
+            characteristic = "06aa3a41-f22a-11e3-9daa-0002a5d5c51b"
+            device.char_write(characteristic, bytearray(AUTH_CODE), wait_for_response=True) #your secret code
+
+    #Subscribe to state change
+    #        device.subscribe("06aa3a12-f22a-11e3-9daa-0002a5d5c51b", callback=handle_data)
+        except Exception as error:
+            print("connect error")
+            time.sleep(5) # wait 5s
+            if tries < 3:
+                print ("<3 write error")
+                self.connectnespresso(device, tries+1) #resend write auth
+            else:
+                print (">5 write error")
+                raise error
+            
     def get_sensor_data(self):
         if time.monotonic() - self.last_scan > self.scan_interval:
             self.last_scan = time.monotonic()
@@ -170,20 +187,22 @@ class NespressoDetect:
                 try:
                     self.adapter.start(reset_on_start=False)
                     dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
-                    characteristic = "06aa3a41-f22a-11e3-9daa-0002a5d5c51b"
-                    dev.char_write(characteristic, bytearray(AUTH_CODE), wait_for_response=True) #your secret code
+                    self.connectnespresso(dev)
+
                     for characteristic in characteristics:
+                        _LOGGER.debug("characteristic {}".format(characteristic))
                         try:
                             data = dev.char_read_handle("0x{:04x}".format(characteristic.handle))
+                            print (data)
                             if characteristic.uuid in sensor_decoders:
                                 _LOGGER.debug("{} data {}".format(mac, data))
-                                #sensor_data = sensor_decoders[characteristic.uuid].decode_data(data)
-                                sensor_data = data
+                                sensor_data = sensor_decoders[characteristic.uuid].decode_data(data)
+                                #sensor_data = data
                                 _LOGGER.debug("{} Got sensordata {}".format(mac, sensor_data))
-                                if self.sensordata.get(mac) is None:
-                                    self.sensordata[mac] = sensor_data
-                                else:
-                                    self.sensordata[mac].update(sensor_data)
+                                #if self.sensordata.get(mac) is None:
+                                self.sensordata[mac] = sensor_data
+                                #else:
+                                #    self.sensordata[mac].update(sensor_data)
                         except (BLEError, NotConnectedError, NotificationTimeout):
                             _LOGGER.exception("Failed to read characteristic")
 
