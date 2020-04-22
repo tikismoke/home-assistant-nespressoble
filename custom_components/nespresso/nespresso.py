@@ -11,8 +11,6 @@ from pygatt.exceptions import BLEError, NotConnectedError, NotificationTimeout
 
 _LOGGER = logging.getLogger(__name__)
 
-#AUTH_CODE = [0x82, 0x87,0xee,0x82,0x59,0x3d,0x3c,0x4e]
-
 # Use full UUID since we do not use UUID from bluepy.btle
 CHAR_UUID_DEVICE_NAME = UUID('00002a00-0000-1000-8000-00805f9b34fb')
 CHAR_UUID_MANUFACTURER_NAME = UUID('00002a00-0000-1000-8000-00805f9b34fb')
@@ -20,6 +18,7 @@ CHAR_UUID_STATE = UUID('06aa3a12-f22a-11e3-9daa-0002a5d5c51b')
 CHAR_UUID_NBCAPS = UUID('06aa3a15-f22a-11e3-9daa-0002a5d5c51b')
 CHAR_UUID_SLIDER = UUID('06aa3a22-f22a-11e3-9daa-0002a5d5c51b')
 CHAR_UUID_WATER_HARDNESS = UUID('06aa3a44-f22a-11e3-9daa-0002a5d5c51b')
+CHAR_UUID_AUTH = UUID('06aa3a41-f22a-11e3-9daa-0002a5d5c51b')
 
 Characteristic = namedtuple('Characteristic', ['uuid', 'name', 'format'])
 
@@ -177,8 +176,7 @@ class NespressoDetect:
     def connectnespresso(self,device,tries=0):
         try:
             #Write the auth code from android or Ios apps to the specific UUID to allow catching value from the machine
-            characteristic = "06aa3a41-f22a-11e3-9daa-0002a5d5c51b"
-            device.char_write(characteristic, binascii.unhexlify(self.auth_code), wait_for_response=True)
+            device.char_write(CHAR_UUID_AUTH, binascii.unhexlify(self.auth_code), wait_for_response=True)
         except Exception as error:
             print("Writing error")
             time.sleep(5) # wait 5s

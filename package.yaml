@@ -1,6 +1,6 @@
 author:
   email: tikismoke@users.noreply.github.com
-  homepage: https://github.com/tikismoke/nespresso2mqtt
+  homepage: https://github.com/tikismoke/home-assistant-nespressoble
   name: Tikismoke
 description: Nespresso ble component
 files:
