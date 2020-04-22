@@ -11,10 +11,10 @@ from datetime import timedelta
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import (ATTR_DEVICE_CLASS, ATTR_ICON, CONF_MAC,
+from homeassistant.const import (ATTR_DEVICE_CLASS, ATTR_ICON, CONF_MAC, CONF_RESOURCE,
                                  CONF_NAME, CONF_SCAN_INTERVAL,
-                                 CONF_UNIT_SYSTEM, DEVICE_CLASS_TEMPERATURE,
-                                 DEVICE_CLASS_TIMESTAMP,
+                                 CONF_UNIT_SYSTEM,
+                                 DEVICE_CLASS_TEMPERATURE, DEVICE_CLASS_TIMESTAMP,
                                  EVENT_HOMEASSISTANT_STOP, STATE_UNKNOWN,
                                  TEMP_CELSIUS, TEMPERATURE)
 from homeassistant.helpers.entity import Entity
@@ -22,11 +22,8 @@ from homeassistant.helpers.entity import Entity
 from .nespresso import NespressoDetect
 
 _LOGGER = logging.getLogger(__name__)
-CONNECT_TIMEOUT = 30
-SCAN_INTERVAL = timedelta(seconds=300)
 
-ATTR_RADON_LEVEL = 'radon_level'
-DEVICE_CLASS_RADON='radon'
+SCAN_INTERVAL = timedelta(seconds=300)
 
 DEVICE_CLASS_CAPS='caps'
 CAPS_UNITS = 'caps'
@@ -34,7 +31,8 @@ CAPS_UNITS = 'caps'
 DOMAIN = 'Nespresso'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Optional(CONF_MAC, default=''): cv.string,
+    vol.Required(CONF_MAC, default=''): cv.string,
+    vol.Required(CONF_RESOURCE): cv.string,
     vol.Optional(CONF_SCAN_INTERVAL, default=SCAN_INTERVAL): cv.time_period,
 })
 
@@ -56,6 +54,7 @@ class Sensor:
 
 DEVICE_SENSOR_SPECIFICS = { "State":Sensor('State', None, None, None),
                             "water_hardness":Sensor(TEMP_CELSIUS, None, DEVICE_CLASS_TEMPERATURE, None),
+                            "slider":Sensor('Slider', None, None, 'mdi:tray-alert'),
                             "caps_number": Sensor(CAPS_UNITS, None, DEVICE_CLASS_CAPS, 'mdi:thermometer-alert'),
                            }
 
@@ -65,9 +64,10 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     scan_interval = config.get(CONF_SCAN_INTERVAL).total_seconds()
     mac = config.get(CONF_MAC)
     mac = None if mac == '' else mac
+    auth = config.get(CONF_RESOURCE)
 
     _LOGGER.debug("Searching for Nespresso sensors...")
-    Nespressodetect = NespressoDetect(scan_interval, mac)
+    Nespressodetect = NespressoDetect(scan_interval, auth, mac)
     try:
         if mac is None:
             num_devices_found = Nespressodetect.find_devices()
@@ -94,7 +94,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         for mac, data in sensordata.items():
             for name, val in data.items():
                 _LOGGER.debug("{}: {}: {}".format(mac, name, val))
-                ha_entities.append(NespressoSensor(mac, name, Nespressodetect, devices_info[mac],
+                ha_entities.append(NespressoSensor(mac, auth, name, Nespressodetect, devices_info[mac],
                                                    DEVICE_SENSOR_SPECIFICS[name]))
     except:
         _LOGGER.exception("Failed intial setup.")
@@ -105,10 +105,11 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
 class NespressoSensor(Entity):
     """General Representation of an Nespresso sensor."""
-    def __init__(self, mac, name, device, device_info, sensor_specifics):
+    def __init__(self, mac, auth, name, device, device_info, sensor_specifics):
         """Initialize a sensor."""
         self.device = device
         self._mac = mac
+        self.auth = auth
         self._name = '{}-{}'.format(mac, name)
         _LOGGER.debug("Added sensor entity {}".format(self._name))
         self._sensor_name = name

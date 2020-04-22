@@ -1,3 +1,4 @@
+import binascii
 import logging
 import struct
 import time
@@ -10,7 +11,7 @@ from pygatt.exceptions import BLEError, NotConnectedError, NotificationTimeout
 
 _LOGGER = logging.getLogger(__name__)
 
-AUTH_CODE = [0x82, 0x87,0xee,0x82,0x59,0x3d,0x3c,0x4e]
+#AUTH_CODE = [0x82, 0x87,0xee,0x82,0x59,0x3d,0x3c,0x4e]
 
 # Use full UUID since we do not use UUID from bluepy.btle
 CHAR_UUID_DEVICE_NAME = UUID('00002a00-0000-1000-8000-00805f9b34fb')
@@ -44,17 +45,26 @@ sensors_characteristics_uuid_str = [str(x) for x in sensors_characteristics_uuid
 
 
 class BaseDecode:
-    def __init__(self, name, format_type, scale):
+    def __init__(self, name, format_type):
         self.name = name
         self.format_type = format_type
-        self.scale = scale
 
     def decode_data(self, raw_data):
-        val = struct.unpack(
-            self.format_type,
-            raw_data)
-        if len(val) == 1:
-            res = val[0] * self.scale
+        #val = struct.unpack(self.format_type,raw_data)
+        val = raw_data
+        if self.format_type == "caps_number":
+            res = int.from_bytes(val,byteorder='big')
+        elif self.format_type == "water_hardness":
+            res = binascii.hexlify(val)
+
+        elif self.format_type == "slider":
+            res = binascii.hexlify(val)
+            if (res) == b'00':
+                res = 0
+            elif (res) == b'02':
+                res = 1
+            else :
+                res = "N/A"
         else:
             res = val
         return {self.name:res}
@@ -76,16 +86,17 @@ class PlussDecode(BaseDecode):
         return data
 
 
-sensor_decoders = {str(CHAR_UUID_STATE):BaseDecode(name="State", format_type='HHHHHHHHHHHHHHHHHH', scale=0),
-                   str(CHAR_UUID_NBCAPS):BaseDecode(name="caps_number", format_type='HHHHHHHHHHHHHH', scale=0),
-                   str(CHAR_UUID_SLIDER):BaseDecode(name="slider", format_type='H', scale=0),
-                   str(CHAR_UUID_WATER_HARDNESS):BaseDecode(name="water_hardness", format_type='HHHHHHHH', scale=0),}
+sensor_decoders = {str(CHAR_UUID_STATE):BaseDecode(name="State", format_type='HHHHHHHHHHHHHHHHHH'),
+                   str(CHAR_UUID_NBCAPS):BaseDecode(name="caps_number", format_type='caps_number'),
+                   str(CHAR_UUID_SLIDER):BaseDecode(name="slider", format_type='slider'),
+                   str(CHAR_UUID_WATER_HARDNESS):BaseDecode(name="water_hardness", format_type='water_hardness'),}
 
 
 class NespressoDetect:
-    def __init__(self, scan_interval, mac=None):
+    def __init__(self, scan_interval, AUTH_CODE=None, mac=None):
         self.adapter = pygatt.backends.GATTToolBackend()
         self.nespresso_devices = [] if mac is None else [mac]
+        self.auth_code = AUTH_CODE
         self.sensors = []
         self.sensordata = {}
         self.scan_interval = scan_interval
@@ -165,17 +176,15 @@ class NespressoDetect:
 
     def connectnespresso(self,device,tries=0):
         try:
+            #Write the auth code from android or Ios apps to the specific UUID to allow catching value from the machine
             characteristic = "06aa3a41-f22a-11e3-9daa-0002a5d5c51b"
-            device.char_write(characteristic, bytearray(AUTH_CODE), wait_for_response=True) #your secret code
-
-    #Subscribe to state change
-    #        device.subscribe("06aa3a12-f22a-11e3-9daa-0002a5d5c51b", callback=handle_data)
+            device.char_write(characteristic, binascii.unhexlify(self.auth_code), wait_for_response=True)
         except Exception as error:
-            print("connect error")
+            print("Writing error")
             time.sleep(5) # wait 5s
             if tries < 3:
                 print ("<3 write error")
-                self.connectnespresso(device, tries+1) #resend write auth
+                self.connectnespresso(device, tries+1) #retry
             else:
                 print (">5 write error")
                 raise error
@@ -188,21 +197,19 @@ class NespressoDetect:
                     self.adapter.start(reset_on_start=False)
                     dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
                     self.connectnespresso(dev)
-
                     for characteristic in characteristics:
                         _LOGGER.debug("characteristic {}".format(characteristic))
                         try:
                             data = dev.char_read_handle("0x{:04x}".format(characteristic.handle))
-                            print (data)
                             if characteristic.uuid in sensor_decoders:
-                                _LOGGER.debug("{} data {}".format(mac, data))
+                                _LOGGER.debug("{} data {}".format(characteristic.uuid, data))
                                 sensor_data = sensor_decoders[characteristic.uuid].decode_data(data)
-                                #sensor_data = data
+                                #sensor_data = str(data)
                                 _LOGGER.debug("{} Got sensordata {}".format(mac, sensor_data))
-                                #if self.sensordata.get(mac) is None:
-                                self.sensordata[mac] = sensor_data
-                                #else:
-                                #    self.sensordata[mac].update(sensor_data)
+                                if self.sensordata.get(mac) is None:
+                                    self.sensordata[mac] = sensor_data
+                                else:
+                                    self.sensordata[mac].update(sensor_data)
                         except (BLEError, NotConnectedError, NotificationTimeout):
                             _LOGGER.exception("Failed to read characteristic")
 
