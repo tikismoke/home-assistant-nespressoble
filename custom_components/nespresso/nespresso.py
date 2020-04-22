@@ -10,6 +10,8 @@ from pygatt.exceptions import BLEError, NotConnectedError, NotificationTimeout
 
 _LOGGER = logging.getLogger(__name__)
 
+AUTH_CODE = [0x82, 0x87,0xee,0x82,0x59,0x3d,0x3c,0x4e]
+
 # Use full UUID since we do not use UUID from bluepy.btle
 CHAR_UUID_DEVICE_NAME = UUID('00002a00-0000-1000-8000-00805f9b34fb')
 CHAR_UUID_MANUFACTURER_NAME = UUID('00002a00-0000-1000-8000-00805f9b34fb')
@@ -101,7 +103,7 @@ class NespressoDetect:
             _LOGGER.debug("connecting to {}".format(mac))
             try:
                 self.adapter.start(reset_on_start=False)
-                dev = self.adapter.connect(mac, 3)
+                dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
                 _LOGGER.debug("Connected")
                 try:
                     data = dev.char_read(manufacturer_characteristics.uuid)
@@ -128,7 +130,7 @@ class NespressoDetect:
             device = NespressoDeviceInfo(serial_nr=mac)
             try:
                 self.adapter.start(reset_on_start=False)
-                dev = self.adapter.connect(mac, 3)
+                dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
                 for characteristic in device_info_characteristics:
                     try:
                         data = dev.char_read(characteristic.uuid)
@@ -148,7 +150,7 @@ class NespressoDetect:
         for mac in self.nespresso_devices:
             try:
                 self.adapter.start(reset_on_start=False)
-                dev = self.adapter.connect(mac, 3)
+                dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
                 characteristics = dev.discover_characteristics()
                 sensor_characteristics =  []
                 for characteristic in characteristics.values():
@@ -167,12 +169,16 @@ class NespressoDetect:
             for mac, characteristics in self.sensors.items():
                 try:
                     self.adapter.start(reset_on_start=False)
-                    dev = self.adapter.connect(mac, 3)
+                    dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
+                    characteristic = "06aa3a41-f22a-11e3-9daa-0002a5d5c51b"
+                    dev.char_write(characteristic, bytearray(AUTH_CODE), wait_for_response=True) #your secret code
                     for characteristic in characteristics:
                         try:
                             data = dev.char_read_handle("0x{:04x}".format(characteristic.handle))
                             if characteristic.uuid in sensor_decoders:
-                                sensor_data = sensor_decoders[characteristic.uuid].decode_data(data)
+                                _LOGGER.debug("{} data {}".format(mac, data))
+                                #sensor_data = sensor_decoders[characteristic.uuid].decode_data(data)
+                                sensor_data = data
                                 _LOGGER.debug("{} Got sensordata {}".format(mac, sensor_data))
                                 if self.sensordata.get(mac) is None:
                                     self.sensordata[mac] = sensor_data
