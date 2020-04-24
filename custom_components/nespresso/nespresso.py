@@ -1,4 +1,5 @@
 import binascii
+import ctypes
 import logging
 import struct
 import time
@@ -22,9 +23,30 @@ CHAR_UUID_AUTH = UUID('06aa3a41-f22a-11e3-9daa-0002a5d5c51b')
 
 Characteristic = namedtuple('Characteristic', ['uuid', 'name', 'format'])
 
+c_uint8 = ctypes.c_uint8
+
 manufacturer_characteristics = Characteristic(CHAR_UUID_MANUFACTURER_NAME, 'manufacturer', "utf-8")
 device_info_characteristics = [manufacturer_characteristics,
                                Characteristic(CHAR_UUID_DEVICE_NAME, 'device_name', "utf-8")]
+
+class Flags_bits( ctypes.LittleEndianStructure ):
+     _fields_ = [
+                 ("bit0",     c_uint8, 1 ),  # asByte & 1
+                 ("bit1",     c_uint8, 1 ),  # asByte & 2
+                 ("bit2",     c_uint8, 1 ),  # asByte & 4
+                 ("bit3",     c_uint8, 1 ),  # asByte & 8
+                 ("bit4",     c_uint8, 1 ),  # asByte & 16
+                 ("bit5",     c_uint8, 1 ),  # asByte & 32
+                 ("bit6",     c_uint8, 1 ),  # asByte & 64
+                 ("bit7",     c_uint8, 1 ),  # asByte & 128
+                ]
+
+class Flags( ctypes.Union ):
+     _anonymous_ = ("bit",)
+     _fields_ = [
+                 ("bit",    Flags_bits ),
+                 ("asByte", c_uint8    )
+                ]
 
 class NespressoDeviceInfo:
     def __init__(self, manufacturer='', serial_nr='', model_nr='', device_name=''):
@@ -38,6 +60,7 @@ class NespressoDeviceInfo:
             self.manufacturer, self.model_nr, self.serial_nr, self.device_name)
 
 
+BYTE = Flags()
 sensors_characteristics_uuid = [CHAR_UUID_STATE, CHAR_UUID_NBCAPS, CHAR_UUID_SLIDER, CHAR_UUID_WATER_HARDNESS]
 
 sensors_characteristics_uuid_str = [str(x) for x in sensors_characteristics_uuid]
@@ -54,8 +77,9 @@ class BaseDecode:
         if self.format_type == "caps_number":
             res = int.from_bytes(val,byteorder='big')
         elif self.format_type == "water_hardness":
-            res = binascii.hexlify(val)
-
+            #BYTE.asByte = val[0]
+            #res = BYTE.bit1
+            res = val
         elif self.format_type == "slider":
             res = binascii.hexlify(val)
             if (res) == b'00':
@@ -64,11 +88,36 @@ class BaseDecode:
                 res = 1
             else :
                 res = "N/A"
+        elif self.format_type == "state":
+            BYTE0 = Flags()
+            BYTE1 = Flags()
+            BYTE2 = Flags()
+            BYTE3 = Flags()
+            
+            BYTE0.asByte = val[0]
+            BYTE1.asByte = val[1]
+            # TODO error counter
+            BYTE2.asByte = val[2]
+            BYTE3.asByte = val[3]
+            return {"water_is_empty":BYTE0.bit0,
+                    "descaled_needed":BYTE0.bit3,
+                    "capsule_mechanism_jammed":BYTE0.bit4,
+                    "always_1":BYTE0.bit6,
+                    "water_temp_low":BYTE1.bit0,
+                    "awake":BYTE1.bit1,
+                    "water_engadged":BYTE1.bit2,
+                    "sleeping":BYTE1.bit3,
+                    "tray_sensor_during_brewing":BYTE1.bit4,
+                    "tray_open_tray_sensor_full":BYTE1.bit6,
+                    "capsule_engaged":BYTE1.bit7,
+                    "Fault":BYTE3.bit5
+                    }
         else:
+            _LOGGER.debug("state_decoder else")
             res = val
         return {self.name:res}
-
-sensor_decoders = {str(CHAR_UUID_STATE):BaseDecode(name="State", format_type='HHHHHHHHHHHHHHHHHH'),
+ 
+sensor_decoders = {str(CHAR_UUID_STATE):BaseDecode(name="state", format_type='state'),
                    str(CHAR_UUID_NBCAPS):BaseDecode(name="caps_number", format_type='caps_number'),
                    str(CHAR_UUID_SLIDER):BaseDecode(name="slider", format_type='slider'),
                    str(CHAR_UUID_WATER_HARDNESS):BaseDecode(name="water_hardness", format_type='water_hardness'),}
@@ -99,7 +148,7 @@ class NespressoDetect:
                 try:
                     data = dev.char_read(manufacturer_characteristics.uuid)
                     manufacturer_name = data.decode(manufacturer_characteristics.format)
-                    if "Nespresso" in manufacturer_name.lower():
+                    if "prodigio" in manufacturer_name.lower():
                         self.nespresso_devices.append(mac)
                 except (BLEError, NotConnectedError, NotificationTimeout):
                     _LOGGER.debug("connection to {} failed".format(mac))

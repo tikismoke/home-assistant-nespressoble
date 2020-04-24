@@ -14,10 +14,8 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (ATTR_DEVICE_CLASS, ATTR_ICON, CONF_MAC,
                                  CONF_NAME, CONF_RESOURCE, CONF_SCAN_INTERVAL,
-                                 CONF_UNIT_SYSTEM, DEVICE_CLASS_TEMPERATURE,
-                                 DEVICE_CLASS_TIMESTAMP,
-                                 EVENT_HOMEASSISTANT_STOP, STATE_UNKNOWN,
-                                 TEMP_CELSIUS, TEMPERATURE)
+                                 CONF_UNIT_SYSTEM, DEVICE_CLASS_TIMESTAMP,
+                                 EVENT_HOMEASSISTANT_STOP, STATE_UNKNOWN)
 from homeassistant.helpers.entity import Entity
 
 from .nespresso import NespressoDetect
@@ -53,9 +51,21 @@ class Sensor:
         return {}
 
 
-DEVICE_SENSOR_SPECIFICS = { "State":Sensor('State', None, None, None),
-                            "water_hardness":Sensor(TEMP_CELSIUS, None, DEVICE_CLASS_TEMPERATURE, None),
-                            "slider":Sensor('Slider', None, None, 'mdi:tray-alert'),
+DEVICE_SENSOR_SPECIFICS = { "state":Sensor(None, None, None, None),
+                            "water_is_empty":Sensor(None, None, None, None),
+                            "descaled_needed":Sensor(None, None, None, None),
+                            "capsule_mechanism_jammed":Sensor(None, None, None, None),
+                            "always_1":Sensor(None, None, None, None),
+                            "water_temp_low":Sensor(None, None, None, None),
+                            "awake":Sensor(None, None, None, None),
+                            "water_engadged":Sensor(None, None, None, None),
+                            "sleeping":Sensor(None, None, None, None),
+                            "tray_sensor_during_brewing":Sensor(None, None, None, None),
+                            "tray_open_tray_sensor_full":Sensor(None, None, None, None),
+                            "capsule_engaged":Sensor(None, None, None, None),
+                            "Fault":Sensor(None, None, None, None),
+                            "water_hardness":Sensor(None, None, None, None),
+                            "slider":Sensor(None, None, None, 'mdi:tray-alert'),
                             "caps_number": Sensor(CAPS_UNITS, None, DEVICE_CLASS_CAPS, 'mdi:thermometer-alert'),
                            }
 
