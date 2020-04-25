@@ -99,6 +99,11 @@ class BaseDecode:
             # TODO error counter
             BYTE2.asByte = val[2]
             BYTE3.asByte = val[3]
+            try:
+                descaling_counter = int.from_bytes(val[6:9],byteorder='big')
+            except:
+                _LOGGER.debug("can't get descaling counter")
+                descaling_counter = 0            
             return {"water_is_empty":BYTE0.bit0,
                     "descaling_needed":BYTE0.bit2,
                     "capsule_mechanism_jammed":BYTE0.bit4,
@@ -110,7 +115,8 @@ class BaseDecode:
                     "tray_sensor_during_brewing":BYTE1.bit4,
                     "tray_open_tray_sensor_full":BYTE1.bit6,
                     "capsule_engaged":BYTE1.bit7,
-                    "Fault":BYTE3.bit5
+                    "Fault":BYTE3.bit5,
+                    "descaling_counter":descaling_counter
                     }
         else:
             _LOGGER.debug("state_decoder else")
