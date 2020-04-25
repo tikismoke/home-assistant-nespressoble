@@ -100,7 +100,7 @@ class BaseDecode:
             BYTE2.asByte = val[2]
             BYTE3.asByte = val[3]
             return {"water_is_empty":BYTE0.bit0,
-                    "descaled_needed":BYTE0.bit3,
+                    "descaling_needed":BYTE0.bit2,
                     "capsule_mechanism_jammed":BYTE0.bit4,
                     "always_1":BYTE0.bit6,
                     "water_temp_low":BYTE1.bit0,

@@ -1,5 +1,5 @@
 {
-    "domain": "Nespresso",
+    "domain": "nespresso",
     "name": "Nespresso BLE coffee machine",
     "documentation": "https://github.com/tikismoke/home-assistant-nespressoble",
     "dependencies": [],

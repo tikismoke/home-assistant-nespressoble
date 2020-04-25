@@ -55,7 +55,7 @@ class Sensor:
 
 DEVICE_SENSOR_SPECIFICS = { "state":Sensor(None, None, None, None),
                             "water_is_empty":Sensor(None, None, None, None),
-                            "descaled_needed":Sensor(None, None, None, None),
+                            "descaling_needed":Sensor(None, None, None, None),
                             "capsule_mechanism_jammed":Sensor(None, None, None, None),
                             "always_1":Sensor(None, None, None, None),
                             "water_temp_low":Sensor(None, None, None, None),
