@@ -122,7 +122,6 @@ class NespressoSensor(Entity):
         self._mac = mac
         self.auth = auth
         self._name = '{}-{}'.format(device_info, name)
-        #self._name = '{}'.format(name)
         _LOGGER.debug("Added sensor entity {}".format(self._name))
         self._sensor_name = name
 
