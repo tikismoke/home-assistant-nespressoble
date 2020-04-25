@@ -82,8 +82,10 @@ class BaseDecode:
             res = binascii.hexlify(val)
             if (res) == b'00':
                 res = 0
+                #res = 'on'
             elif (res) == b'02':
                 res = 1
+                #res = 'off'
             else :
                 res = "N/A"
         elif self.format_type == "state":
@@ -207,8 +209,9 @@ class NespressoDetect:
 
         return self.sensors
     
-    def make_a_coffee(self):
+    def make_coffee_flow(self, mac):
         try:
+            _LOGGER.exception("make flow a coffee")
             self.adapter.start(reset_on_start=False)
             dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
             self.connectnespresso(dev)
@@ -216,10 +219,10 @@ class NespressoDetect:
                 characteristic = "06aa3a42-f22a-11e3-9daa-0002a5d5c51b"
                 dev.char_write(characteristic, bytearray([0x03,0x05,0X07,0x04,0x00,0x00,0x00,0x00,0x00,0x02]), wait_for_response=True)
             except (BLEError, NotConnectedError, NotificationTimeout):
-                _LOGGER.exception("Failed to write characteristic")
+                _LOGGER.exception("Failed to write characteristic for coffee flow")
             dev.disconnect()
         except (BLEError, NotConnectedError, NotificationTimeout):
-            _LOGGER.exception("Failed to connect")
+            _LOGGER.exception("Failed to connect for coffee flow")
             self.adapter.stop()
 
     def connectnespresso(self,device,tries=0):

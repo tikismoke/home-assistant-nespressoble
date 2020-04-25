@@ -16,6 +16,8 @@ from homeassistant.const import (ATTR_DEVICE_CLASS, ATTR_ICON, CONF_MAC,
                                  CONF_NAME, CONF_RESOURCE, CONF_SCAN_INTERVAL,
                                  CONF_UNIT_SYSTEM, DEVICE_CLASS_TIMESTAMP,
                                  EVENT_HOMEASSISTANT_STOP, STATE_UNKNOWN)
+from homeassistant.components.binary_sensor import (PLATFORM_SCHEMA, BinarySensorDevice,
+                                                   DEVICE_CLASS_MOTION, DEVICE_CLASS_DOOR)
 from homeassistant.helpers.entity import Entity
 
 from .nespresso import NespressoDetect
@@ -27,7 +29,7 @@ SCAN_INTERVAL = timedelta(seconds=300)
 DEVICE_CLASS_CAPS='caps'
 CAPS_UNITS = 'caps'
 
-DOMAIN = 'Nespresso'
+DOMAIN = 'nespresso'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MAC, default=''): cv.string,
@@ -65,7 +67,7 @@ DEVICE_SENSOR_SPECIFICS = { "state":Sensor(None, None, None, None),
                             "capsule_engaged":Sensor(None, None, None, None),
                             "Fault":Sensor(None, None, None, None),
                             "water_hardness":Sensor(None, None, None, None),
-                            "slider":Sensor(None, None, None, 'mdi:tray-alert'),
+                            "slider":Sensor(None, None, DEVICE_CLASS_DOOR, 'mdi:tray-alert'),
                             "caps_number": Sensor(CAPS_UNITS, None, DEVICE_CLASS_CAPS, 'mdi:thermometer-alert'),
                            }
 
@@ -113,7 +115,16 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     add_entities(ha_entities, True)
 
+    
+    async def make_a_cofee(call):
+        """Send a command command."""
+        mac = call.data.get('mac')
+        _LOGGER.debug("make_a_cofee mac {} ".format(mac))
+        _LOGGER.debug("make_a_cofee call {} ".format(call))
+        return Nespressodetect.make_coffee_flow(mac)
 
+    hass.services.async_register(DOMAIN, "coffee", make_a_cofee)    
+    
 class NespressoSensor(Entity):
     """General Representation of an Nespresso sensor."""
     def __init__(self, mac, auth, name, device, device_info, sensor_specifics):
@@ -175,8 +186,4 @@ class NespressoSensor(Entity):
         else:
             self._state = round(float(value * self._sensor_specifics.unit_scale), 2)
         _LOGGER.debug("State {} {}".format(self._name, self._state))
-
-    def make_a_cofee(self, command):
-        """Send a command command."""
-        return self.device.make_a_coffee()
     
