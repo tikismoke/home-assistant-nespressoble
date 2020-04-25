@@ -202,20 +202,34 @@ class NespressoDetect:
                 _LOGGER.exception("Failed to discover sensors")
 
         return self.sensors
+    
+    def make_a_coffee(self):
+        try:
+            self.adapter.start(reset_on_start=False)
+            dev = self.adapter.connect(mac, address_type=pygatt.BLEAddressType.random)
+            self.connectnespresso(dev)
+            try:
+                characteristic = "06aa3a42-f22a-11e3-9daa-0002a5d5c51b"
+                dev.char_write(characteristic, bytearray([0x03,0x05,0X07,0x04,0x00,0x00,0x00,0x00,0x00,0x02]), wait_for_response=True)
+            except (BLEError, NotConnectedError, NotificationTimeout):
+                _LOGGER.exception("Failed to write characteristic")
+            dev.disconnect()
+        except (BLEError, NotConnectedError, NotificationTimeout):
+            _LOGGER.exception("Failed to connect")
+            self.adapter.stop()
 
     def connectnespresso(self,device,tries=0):
         try:
             #Write the auth code from android or Ios apps to the specific UUID to allow catching value from the machine
             device.char_write(CHAR_UUID_AUTH, binascii.unhexlify(self.auth_code), wait_for_response=True)
-        except Exception as error:
-            print("Writing error")
+        except (BLEError, NotConnectedError, NotificationTimeout):
+            _LOGGER.exception("Failed to send auth code, retrying in 5s")
             time.sleep(5) # wait 5s
             if tries < 3:
-                print ("<3 write error")
+                _LOGGER.exception("Failed to send auth code, 3 times")
                 self.connectnespresso(device, tries+1) #retry
             else:
-                print (">5 write error")
-                raise error
+                _LOGGER.exception("Failed to send auth code, more than 3 times")
             
     def get_sensor_data(self):
         if time.monotonic() - self.last_scan > self.scan_interval:
