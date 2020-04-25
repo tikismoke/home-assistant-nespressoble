@@ -77,9 +77,7 @@ class BaseDecode:
         if self.format_type == "caps_number":
             res = int.from_bytes(val,byteorder='big')
         elif self.format_type == "water_hardness":
-            #BYTE.asByte = val[0]
-            #res = BYTE.bit1
-            res = val
+            res = int.from_bytes(val[2:3],byteorder='big')
         elif self.format_type == "slider":
             res = binascii.hexlify(val)
             if (res) == b'00':
@@ -162,7 +160,7 @@ class NespressoDetect:
         _LOGGER.debug("Found {} Nespresso devices".format(len(self.nespresso_devices)))
         return len(self.nespresso_devices)
 
-    def get_info(self):
+    def get_info(self,tries=0):
         # Try to get some info from the discovered Nespresso devices
         self.devices = {}
 
@@ -180,6 +178,12 @@ class NespressoDetect:
                 dev.disconnect()
             except (BLEError, NotConnectedError, NotificationTimeout):
                 _LOGGER.exception("")
+                time.sleep(5) # wait 5s
+                if tries < 3:
+                    _LOGGER.exception("Failed to get_info, 3 times")
+                    self.get_info(tries+1) #retry
+                else:
+                    _LOGGER.exception("Failed to get_info, more than 3 times")
             self.adapter.stop()
             self.devices[mac] = device
 

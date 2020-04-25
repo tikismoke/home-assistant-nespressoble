@@ -105,7 +105,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         for mac, data in sensordata.items():
             for name, val in data.items():
                 _LOGGER.debug("{}: {}: {}".format(mac, name, val))
-                ha_entities.append(NespressoSensor(mac, auth, name, Nespressodetect, devices_info[manufacturer],
+                ha_entities.append(NespressoSensor(mac, auth, name, Nespressodetect, devices_info[mac].manufacturer,
                                                    DEVICE_SENSOR_SPECIFICS[name]))
     except:
         _LOGGER.exception("Failed intial setup.")
@@ -122,6 +122,7 @@ class NespressoSensor(Entity):
         self._mac = mac
         self.auth = auth
         self._name = '{}-{}'.format(device_info, name)
+        #self._name = '{}'.format(name)
         _LOGGER.debug("Added sensor entity {}".format(self._name))
         self._sensor_name = name
 
