@@ -223,13 +223,54 @@ class NespressoDetect:
             self.connectnespresso(dev)
             try:
                 characteristic = "06aa3a42-f22a-11e3-9daa-0002a5d5c51b"
-                dev.char_write(characteristic, bytearray([0x03,0x05,0X07,0x04,0x00,0x00,0x00,0x00,0x00,0x02]), wait_for_response=True)
+                command = "0305070400000000"
+                # TODO when temp will be used for other machine
+                command += "00"
+                if volume == "espresso":
+                    command += "01"
+                elif volume == "lungo":
+                    command += "02"
+                elif volume == "ristretto":
+                    command += "00"
+                else :
+                    command += "00"
+                #dev.char_write(characteristic, bytearray([0x03,0x05,0X07,0x04,0x00,0x00,0x00,0x00,0x00,0x02]), wait_for_response=True)
+                dev.char_write(characteristic, binascii.unhexlify(command, wait_for_response=True)
             except (BLEError, NotConnectedError, NotificationTimeout):
                 _LOGGER.exception("Failed to write characteristic for coffee flow")
             dev.disconnect()
         except (BLEError, NotConnectedError, NotificationTimeout):
             _LOGGER.exception("Failed to connect for coffee flow")
             self.adapter.stop()
+
+#    generateNespressoCommand: function(volume, temperature) {
+#        var command = "0305070400000000";
+#        if (temperature == "low") {
+#            command += "01";
+#        } else if (temperature == "medium") {
+#            command += "00";
+#        } else if (temperature == "high") {
+#            command += "02";
+#        } else {
+#            return "";
+#        }
+#        if (volume == "ristretto") {
+#            command += "00";
+#        } else if (volume == "espresso") {
+#            command += "01";
+#        } else if (volume == "lungo") {
+#            command += "02";
+#        } else if (volume == "hotwater") {
+#            command += "05";
+#        } else if (volume == "americano") {
+#            command += "05";
+#        } else if (volume == "recipe") {
+#            command += "07";
+#        } else {
+#            return "";
+#        }
+#        return command;
+#    },
 
     def connectnespresso(self,device,tries=0):
         try:
