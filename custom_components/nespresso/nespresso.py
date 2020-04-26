@@ -235,7 +235,7 @@ class NespressoDetect:
                 else :
                     command += "00"
                 #dev.char_write(characteristic, bytearray([0x03,0x05,0X07,0x04,0x00,0x00,0x00,0x00,0x00,0x02]), wait_for_response=True)
-                dev.char_write(characteristic, binascii.unhexlify(command, wait_for_response=True))
+                dev.char_write(characteristic, binascii.unhexlify(command), wait_for_response=True)
             except (BLEError, NotConnectedError, NotificationTimeout):
                 _LOGGER.exception("Failed to write characteristic for coffee flow")
             dev.disconnect()
