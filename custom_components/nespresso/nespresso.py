@@ -239,6 +239,7 @@ class NespressoDetect:
             except (BLEError, NotConnectedError, NotificationTimeout):
                 _LOGGER.exception("Failed to write characteristic for coffee flow")
             dev.disconnect()
+            self.adapter.stop()
         except (BLEError, NotConnectedError, NotificationTimeout):
             _LOGGER.exception("Failed to connect for coffee flow")
             self.adapter.stop()
