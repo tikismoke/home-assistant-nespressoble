@@ -3,4 +3,4 @@ coffee:
   fields:
     mac:
       description: mac address of the machine
-      example: 'mac: "d2:12:f1:7b:cd:6d"'
+      example: '"d2:12:f1:7b:cd:6d"'
