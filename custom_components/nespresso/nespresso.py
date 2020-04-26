@@ -215,7 +215,7 @@ class NespressoDetect:
 
         return self.sensors
     
-    def make_coffee_flow(self, mac):
+    def make_coffee_flow(self, mac, volume="lungo"):
         try:
             _LOGGER.exception("make flow a coffee")
             self.adapter.start(reset_on_start=False)
@@ -235,7 +235,7 @@ class NespressoDetect:
                 else :
                     command += "00"
                 #dev.char_write(characteristic, bytearray([0x03,0x05,0X07,0x04,0x00,0x00,0x00,0x00,0x00,0x02]), wait_for_response=True)
-                dev.char_write(characteristic, binascii.unhexlify(command, wait_for_response=True)
+                dev.char_write(characteristic, binascii.unhexlify(command, wait_for_response=True))
             except (BLEError, NotConnectedError, NotificationTimeout):
                 _LOGGER.exception("Failed to write characteristic for coffee flow")
             dev.disconnect()
