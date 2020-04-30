@@ -19,7 +19,7 @@ sudo apt install bluez
 
 ## Features
 * Supports make a lungo coffee via service
-* Supports reading lots of state
+* Supports reading lots of states
 * Even more incoming
 
 ## Still under developpment
