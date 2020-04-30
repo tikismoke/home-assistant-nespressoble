@@ -72,5 +72,4 @@ Only lungo coffee command for the moment
 one: https://www.amazon.com/dp/B01N5MGEUS/ref=cm_sw_r_tw_dp_U_x_ObdNCb03P7QZJ
 
 ## Other Resources
-* https://community.home-assistant.io/t/
-nespresso-integration/127407
+* https://community.home-assistant.io/t/nespresso-integration/127407
