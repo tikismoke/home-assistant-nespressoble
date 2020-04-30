@@ -4,10 +4,18 @@ Simple Nespresso Ble coffee machine integrations
 It's based on pygatt and need a bluetooth device ble compatible to read Nespresso information.
 
 Note that you need to find your auth code from the officials apps.
+
 It's much easy with reading thoses tutorials and example:
+
 https://gist.github.com/farminf/94f681eaca2760212f457ac59da99f23
+
 https://medium.com/@urish/reverse-engineering-a-bluetooth-lightbulb-56580fcb7546
 
+Pygattl required bluez to be installed on the host
+
+```
+sudo apt install bluez
+```
 
 ## Features
 * Supports make a lungo coffee via service
@@ -16,6 +24,7 @@ https://medium.com/@urish/reverse-engineering-a-bluetooth-lightbulb-56580fcb7546
 
 ## Still under developpment
 This conponent use the reversed one here: https://github.com/petergullberg/brewbutton .
+
 It is completelly based on this integrations https://github.com/custom-components/sensor.airthings_wave .
 Thank's to Marty for is creation.
 
