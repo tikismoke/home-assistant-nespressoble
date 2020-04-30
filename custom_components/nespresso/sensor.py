@@ -69,7 +69,7 @@ DEVICE_SENSOR_SPECIFICS = { "state":Sensor(None, None, None, None),
                             "descaling_counter":Sensor(None, None, None, 'mdi:silverware-clean'),
                             "water_hardness":Sensor(None, None, None, 'mdi:water-percent'),
                             "slider":Sensor(None, None, DEVICE_CLASS_DOOR, 'mdi:gate-and'),
-                            "caps_number": Sensor(CAPS_UNITS, None, DEVICE_CLASS_CAPS, 'mdi:thermometer-alert'),
+                            "caps_number": Sensor(CAPS_UNITS, None, DEVICE_CLASS_CAPS, 'mdi:counter'),
                            }
 
 
