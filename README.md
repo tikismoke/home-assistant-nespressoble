@@ -41,3 +41,7 @@ Where:
 - `<mac>` must be replace by the bluetooth mac address of the machine
 - `<resource>` is the auth code that you must have catch with bluetooth sniffing the apps
 - `<scan_interval>` Optionnal scant interval in seconds (default=300)
+
+It could look looks like this:
+
+![Image of HASS](HA_integration.png)
