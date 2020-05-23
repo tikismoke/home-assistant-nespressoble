@@ -264,7 +264,12 @@ while True:
             print (bin(value[5]))
             print (bin(value[6]))
             print (bin(value[7]))
-    
+
+	    try:
+                client1.publish("/nespresso/descaling_counter", int.from_bytes(value[6:9],byteorder='big'))
+            except:
+                print ("error publishing descale timer")
+
             trappe = device.char_read("06aa3a22-f22a-11e3-9daa-0002a5d5c51b")
             print("Read Slider %s" % (binascii.hexlify(trappe)))
             BYTE.asByte = trappe[0]
