@@ -2,6 +2,7 @@
   "domain": "nespresso",
   "name": "Nespresso BLE coffee machine",
   "documentation": "https://github.com/tikismoke/home-assistant-nespressoble",
+  "issue_tracker": "https://github.com/tikismoke/home-assistant-nespressoble/issues",
   "dependencies": [],
   "codeowners": ["@Tikismoke"],
   "requirements": ["pygatt[GATTTOOL]==4.0.5"]
