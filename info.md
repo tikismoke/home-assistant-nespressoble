@@ -1,3 +1,6 @@
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-green.svg)](https://github.com/custom-components/hacs)
+[![GitHub release](https://img.shields.io/github/release/tikismoke/home-assistant-nespressoble)](https://GitHub.com/tikismoke/home-assistant-nespressoble/releases/)
+[![GitHub license](https://img.shields.io/github/license/tikismoke/home-assistant-nespressoble)](https://github.com/tikismoke/home-assistant-nespressoble/LICENSE)
 # nespresso
 
 hassio support for Nespresso BLE coffee machine.
