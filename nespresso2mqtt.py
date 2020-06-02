@@ -202,7 +202,7 @@ while True:
                 print ("error publishing this value")
             print( "Descaled needed:  %i" % BYTE.bit2)
             try:
-                client1.publish("/nespresso/state/descaled_needed", BYTE.bit3)
+                client1.publish("/nespresso/state/descaled_needed", BYTE.bit2)
             except:
                 print ("error publishing this value")
             print( "capsule_mechanism_jammed:  %i" % BYTE.bit4)
