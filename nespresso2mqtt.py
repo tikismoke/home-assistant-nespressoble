@@ -265,7 +265,7 @@ while True:
             print (bin(value[6]))
             print (bin(value[7]))
 
-	    try:
+            try:
                 client1.publish("/nespresso/descaling_counter", int.from_bytes(value[6:9],byteorder='big'))
             except:
                 print ("error publishing descale timer")
@@ -288,6 +288,14 @@ while True:
                 client1.publish("/nespresso/caps_count", int.from_bytes(nb_capsule,byteorder='big'))
             except:
                 print ("error publishing this value")
+
+            answer = device.char_read("06aa3a52-f22a-11e3-9daa-0002a5d5c51b")
+            print("answer %s" % (binascii.hexlify(answer)))
+            try:
+                client1.publish("/nespresso/answer", (binascii.hexlify(answer)))
+            except:
+                print ("error publishing this value answer")
+
             oldvalue = value
             time.sleep(2)
     except Exception as e:
