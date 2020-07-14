@@ -35,7 +35,7 @@ Thank's to Marty for is creation.
 ## Sensor configuration
 
 ```
-- platform: Nespresso
+- platform: nespresso
   mac: d2:12:f1:7b:cd:6d
   resource: 8287ee82593d3c4e
   scan_interval: 30
