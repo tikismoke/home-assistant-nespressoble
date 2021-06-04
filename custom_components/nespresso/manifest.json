@@ -4,7 +4,7 @@
   "documentation": "https://github.com/tikismoke/home-assistant-nespressoble",
   "issue_tracker": "https://github.com/tikismoke/home-assistant-nespressoble/issues",
   "dependencies": [],
-  "version": ["1.0.1"],
+  "version": "1.0.1",
   "codeowners": ["@Tikismoke"],
   "requirements": ["pygatt[GATTTOOL]==4.0.5"]
 }
