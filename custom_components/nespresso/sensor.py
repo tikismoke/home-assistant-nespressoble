@@ -16,7 +16,7 @@ from homeassistant.const import (ATTR_DEVICE_CLASS, ATTR_ICON, CONF_MAC,
                                  CONF_NAME, CONF_RESOURCE, CONF_SCAN_INTERVAL,
                                  CONF_UNIT_SYSTEM, DEVICE_CLASS_TIMESTAMP,
                                  EVENT_HOMEASSISTANT_STOP, STATE_UNKNOWN)
-from homeassistant.components.binary_sensor import (PLATFORM_SCHEMA, BinarySensorDevice,
+from homeassistant.components.binary_sensor import (PLATFORM_SCHEMA, BinarySensorEntity,
                                                    DEVICE_CLASS_MOTION, DEVICE_CLASS_DOOR)
 from homeassistant.helpers.entity import Entity
 
