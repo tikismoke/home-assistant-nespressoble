@@ -26,7 +26,10 @@ sudo apt install bluez
 * Supports reading lots of states
 * Even more incoming
 
-## Still under developpment
+## no more under developpment
+I do no more own such a machine and can't test/debug/etc.
+PR are still welcome but help will be limitez sorry.
+
 This conponent use the reversed one here: https://github.com/petergullberg/brewbutton .
 
 It is completelly based on this integrations https://github.com/custom-components/sensor.airthings_wave .
