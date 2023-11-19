@@ -2,6 +2,11 @@
 [![GitHub release](https://img.shields.io/github/release/tikismoke/home-assistant-nespressoble)](https://GitHub.com/tikismoke/home-assistant-nespressoble/releases/)
 [![GitHub license](https://img.shields.io/github/license/tikismoke/home-assistant-nespressoble)](https://github.com/tikismoke/home-assistant-nespressoble/blob/master/LICENSE)
 
+## no more under developpment
+I do no more own such a machine and can't test/debug/etc.
+you should move to this repo who's got lot of improvement:
+https://github.com/bulldog5046/ha_nespresso_ingetration/
+
 # nespresso
 
 Simple Nespresso Ble coffee machine integrations
@@ -21,16 +26,11 @@ Pygattl required bluez to be installed on the host
 sudo apt install bluez
 ```
 
+
 ## Features
 * Supports make a lungo coffee via service
 * Supports reading lots of states
 * Even more incoming
-
-## no more under developpment
-I do no more own such a machine and can't test/debug/etc.
-you should move to this repo who's got lot of improvement:
-https://github.com/bulldog5046/ha_nespresso_ingetration/
-
 
 This conponent use the reversed one here: https://github.com/petergullberg/brewbutton .
 
