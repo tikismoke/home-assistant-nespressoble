@@ -28,7 +28,9 @@ sudo apt install bluez
 
 ## no more under developpment
 I do no more own such a machine and can't test/debug/etc.
-PR are still welcome but help will be limitez sorry.
+you should move to this repo who's got lot of improvement:
+https://github.com/bulldog5046/ha_nespresso_ingetration/
+
 
 This conponent use the reversed one here: https://github.com/petergullberg/brewbutton .
 
